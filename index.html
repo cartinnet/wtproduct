@@ -1,9 +1,228 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-   <title>Pay Now | Cart.in.net</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment Page Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        #html-code-output { white-space: pre-wrap; word-break: break-all; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800">Advanced UPI Page Generator</h1>
+            <p class="text-gray-600 mt-2">Create a fully featured, custom payment page. Fill in the fields and click "Generate".</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Section 1: Input Area -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg h-fit">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3">1. Custom Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="headingInput" class="block text-sm font-medium text-gray-700">Page Heading</label>
+                        <input type="text" id="headingInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" value="One Step Closer — Let’s Complete the Payment">
+                    </div>
+                    <div>
+                        <label for="productNameInput" class="block text-sm font-medium text-gray-700">Product/Service Name</label>
+                        <input type="text" id="productNameInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" value="Awesome Product">
+                    </div>
+                     <div>
+                        <label for="amountInput" class="block text-sm font-medium text-gray-700">Amount (INR) - Use 0 to hide</label>
+                        <input type="number" id="amountInput" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" value="7">
+                    </div>
+                    <div>
+                        <label for="descriptionInput" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea id="descriptionInput" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">Please use the options below to complete your UPI payment.</textarea>
+                    </div>
+                    <div>
+                        <label for="upiIdInput" class="block text-sm font-medium text-gray-700">UPI ID</label>
+                        <input type="text" id="upiIdInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" value="spmohq@oksbi">
+                    </div>
+                    <div>
+                        <label for="qrImageInput" class="block text-sm font-medium text-gray-700">QR Code Image URL</label>
+                        <input type="text" id="qrImageInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" value="spm-gpay.jpeg">
+                    </div>
+                    <div>
+                        <label for="whatsappNumberInput" class="block text-sm font-medium text-gray-700">WhatsApp Number (with country code)</label>
+                        <input type="tel" id="whatsappNumberInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" value="+919876543210">
+                    </div>
+                </div>
+                <button id="generate-button" class="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors">
+                    Generate / Update Page
+                </button>
+            </div>
+
+            <!-- Section 2: Preview & Source Code -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Live Preview -->
+                <div class="bg-white p-6 rounded-xl shadow-lg h-[600px] flex flex-col">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3">2. Live Preview</h2>
+                    <div class="flex-grow border-2 border-gray-200 rounded-md overflow-hidden">
+                        <iframe id="preview-iframe" class="w-full h-full"></iframe>
+                    </div>
+                </div>
+
+                <!-- Source Code -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3">3. Source Code</h2>
+                    <div class="relative">
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-auto h-96"><code id="html-code-output"></code></pre>
+                        <button id="copy-button" class="absolute top-2 right-2 bg-gray-600 hover:bg-gray-500 text-white text-xs font-bold py-1 px-3 rounded-md transition-colors">Copy Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = {
+                heading: document.getElementById('headingInput'),
+                productName: document.getElementById('productNameInput'),
+                amount: document.getElementById('amountInput'),
+                description: document.getElementById('descriptionInput'),
+                upiId: document.getElementById('upiIdInput'),
+                qrImage: document.getElementById('qrImageInput'),
+                whatsappNumber: document.getElementById('whatsappNumberInput'),
+            };
+            const generateButton = document.getElementById('generate-button');
+            const previewIframe = document.getElementById('preview-iframe');
+            const codeOutput = document.getElementById('html-code-output');
+            const copyButton = document.getElementById('copy-button');
+
+            function updatePage() {
+                const values = {
+                    heading: inputs.heading.value.trim(),
+                    productName: inputs.productName.value.trim(),
+                    amount: inputs.amount.value.trim(),
+                    description: inputs.description.value.trim(),
+                    upiId: inputs.upiId.value.trim(),
+                    qrImage: inputs.qrImage.value.trim(),
+                    whatsappNumber: inputs.whatsappNumber.value.trim(),
+                };
+                
+                // --- WhatsApp Link Generation ---
+                const cleanWhatsApp = values.whatsappNumber.replace(/[^0-9]/g, '');
+                const whatsappMessage = `Re: Payment for ${values.productName}`;
+                const encodedWhatsappMessage = encodeURIComponent(whatsappMessage);
+                const whatsappLink = `https://wa.me/${cleanWhatsApp}?text=${encodedWhatsappMessage}`;
+
+                // --- Price Line & UPI Amount Generation ---
+                let amountHtml = '';
+                let upiAmountParam = '';
+                if (values.amount && parseFloat(values.amount) > 0) {
+                    amountHtml = `  <p class="text-3xl md:text-4xl font-bold text-gray-800 my-4">Pay <span class="text-indigo-600">₹${values.amount}</span> for ${values.productName}</p>`;
+                    upiAmountParam = `&am=${values.amount}`;
+                }
+
+                // --- Final HTML Code Generation ---
+                const generatedHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pay Now</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com/"><\/script>
+</head>
+<body class="bg-yellow-50 text-center text-gray-800 p-6">
+
+  <h1 class="text-2xl font-bold mb-2">${values.heading}</h1>
+${amountHtml}
+  <p class="text-lg mb-4">${values.description}</p>
+
+  <button onclick="handleDonate()" class="bg-yellow-300 hover:bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-md transition">
+    Proceed with UPI
+  </button>
+
+  <div id="upi-link-container" class="hidden mt-6">
+    <p class="mb-2">You’ll be redirected to your UPI app to complete the payment:</p>
+    <a id="upi-link" href="#" class="inline-block bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg">Pay via UPI</a>
+  </div>
+
+  <div id="qr-container" class="hidden mt-6">
+    <p class="mb-2">Or scan this QR code:</p>
+    <img id="qr-image" src="" alt="UPI QR Code" class="w-56 h-56 rounded-xl border-2 border-gray-300 mx-auto" />
+  </div>
+
+  <div id="instruction" class="hidden mt-6 bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg max-w-md mx-auto">
+    💬 Once you've completed the payment, please WhatsApp your full name to <strong id="display-whatsapp"></strong>.
+  </div>
+
+  <div class="alert bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg mt-6 max-w-md mx-auto" id="alert-box">
+    <!-- Content will be injected by JavaScript -->
+  </div>
+
+  <script>
+    const config = {
+      upiId: "${values.upiId}",
+      qrImage: "${values.qrImage}",
+      whatsappNumber: "${values.whatsappNumber}",
+      whatsappLink: "${whatsappLink}"
+    };
+
+    document.getElementById("upi-link").href = \`upi://pay?pa=\${config.upiId}&cu=INR${upiAmountParam}\`;
+    document.getElementById("qr-image").src = config.qrImage;
+    document.getElementById("display-whatsapp").textContent = config.whatsappNumber;
+
+    document.getElementById("alert-box").innerHTML = \`
+      <strong>Important:</strong> All payments for <strong>${values.productName}</strong> are considered FINAL and are not eligible for refund or exchange.<br><br>
+      <strong>Note:</strong> Don't forget to send a screenshot of your successful payment via WhatsApp: 
+      <a href="\${config.whatsappLink}" class="underline text-blue-600" target="_blank">Click here to send</a>
+    \`;
+
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function handleDonate() {
+      const upiLinkContainer = document.getElementById("upi-link-container");
+      const qrContainer = document.getElementById("qr-container");
+      const instruction = document.getElementById("instruction");
+
+      if (isMobileDevice()) {
+        upiLinkContainer.classList.remove("hidden");
+        upiLinkContainer.scrollIntoView({ behavior: "smooth" });
+      } else {
+        qrContainer.classList.remove("hidden");
+        qrContainer.scrollIntoView({ behavior: "smooth" });
+      }
+
+      instruction.classList.remove("hidden");
+      setTimeout(() => { instruction.scrollIntoView({ behavior: "smooth" }); }, 300);
+    }
+  <\/script>
+</body>
+</html>`;
+
+                previewIframe.srcdoc = generatedHtml;
+                codeOutput.textContent = generatedHtml;
+            }
+
+            generateButton.addEventListener('click', updatePage);
+
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(codeOutput.textContent).then(() => {
+                    copyButton.textContent = 'Copied!';
+                    copyButton.classList.add('bg-green-500', 'hover:bg-green-500');
+                    setTimeout(() => {
+                        copyButton.textContent = 'Copy Code';
+                        copyButton.classList.remove('bg-green-500', 'hover:bg-green-500');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy code to clipboard.');
+                });
+            });
+
+            updatePage();
+        });
+    </script>
 </body>
 </html>
